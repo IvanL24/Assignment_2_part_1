@@ -23,7 +23,7 @@ public class MyQueue<E> implements QueueADT<E> {
 	}
 
 	@Override
-	public E Peek() throws NoSuchElementException{
+	public E peek() throws NoSuchElementException{
 		if(size() == 0) {
 			throw new NoSuchElementException();
 		}
