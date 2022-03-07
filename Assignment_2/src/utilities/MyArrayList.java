@@ -8,10 +8,14 @@ public class MyArrayList<E> implements ListADT<E>{
 	//attributes
 	private E[] array;
 	private int size;
+	private int length;
 
 	//contructor
+	@SuppressWarnings("unchecked")
 	public MyArrayList() {
 		array = (E[]) new Object[10];
+		size = 0;
+		array = (E[]) new Object [length];
 	}
 	
 	@Override
@@ -26,6 +30,7 @@ public class MyArrayList<E> implements ListADT<E>{
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean add(int index, E toAdd) throws NullPointerException, IndexOutOfBoundsException {
 		if(index < 0 || index > size) {
@@ -34,36 +39,105 @@ public class MyArrayList<E> implements ListADT<E>{
 		if(toAdd == null) {
 			throw new NullPointerException();
 		}
+		
+		E []newarray;
+		
 		if(size == array.length) {
 			//create new array (bigger than the original) x2
 			//use loop to copy everything from the original array into the new array
 			//get array to reference the new array
+			this.length += 10;
+			newarray = (E[]) new Object [length];
+			
+			for (int i = 0; i<size; i++) {
+				newarray[i] = array[i];
+			}
+			
+			newarray[index] = toAdd;
+			array = newarray;
+			size++;
+			newarray = null;
 		}
+		else {
+			array[index] = toAdd;
+			size++;
+		}
+		
 		//TODO Insert toAdd into index position (requires a loop to shift everything from index forward)
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean add(E toAdd) throws NullPointerException {
 		if(toAdd == null) {
 			throw new NullPointerException();
 		}
+		
+		E []newarray;
 		//check for capacity
 		if(size == array.length) {
 			//create new array (bigger than the original) x2
 			//use loop to copy everything from the original array into the new array
 			//get array to reference the new array
+			this.length += 10;
+			newarray = (E[]) new Object[length];
+			
+			for(int i=0; i<size(); i++) {
+				newarray[i] = this.array[i];
+			}
+			
+			newarray[size] = toAdd;
+			this.array = newarray;
+			size++;
+			newarray = null;
+			
 		}
-		array[size] = toAdd;
+		else {
+		array[size()] = toAdd;
 		size++;
+		}
 		return true;
 	}
 
 	@Override
 	public boolean addAll(ListADT<? extends E> toAdd) throws NullPointerException {
-		// TODO Auto-generated method stub
-		return false;
+		if((toAdd == null) || (toAdd.size() <= 0)) {
+			throw new NullPointerException();
+		}
+		
+		int newsize = size() + toAdd.size();
+
+		if(newsize > length) {
+			while(newsize > length) {
+				length += 10;
+			}
+		}
+		
+		loadElementsToArray(newsize, length, toAdd);
+		return true;
 	}
+
+	@SuppressWarnings("unchecked")
+	private void loadElementsToArray(int newsize, int length2, ListADT<? extends E> toAdd) {
+		int index = 0;
+		E []newarray;	
+		
+		newarray = (E[]) new Object[length];
+		
+		for(int i=0; i<this.size; i++, index++) {
+			newarray[index] = this.array[i];
+		}
+		
+		for(int i=0; i<toAdd.size(); i++, index++) {
+			newarray[index] = toAdd.get(i);
+		}
+		
+		this.size = newsize;
+		this.array = newarray;
+		newarray = null;
+	}
+		
 
 	@Override
 	public E get(int index) throws IndexOutOfBoundsException {
@@ -75,14 +149,51 @@ public class MyArrayList<E> implements ListADT<E>{
 
 	@Override
 	public E remove(int index) throws IndexOutOfBoundsException {
-		// TODO Auto-generated method stub
-		return null;
+		if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
+		
+		E toRemove = this.array[index];
+		shiftElementsToLeft(index);
+		
+		return toRemove;
 	}
 
 	@Override
 	public E remove(E toRemove) throws NullPointerException {
-		// TODO Auto-generated method stub
-		return null;
+		if(toRemove == null) { 
+			throw new NullPointerException();
+		}
+		if(size() == 0) {
+			throw new NullPointerException();
+		}
+		
+		E removedElement = null;
+		boolean toRemoveElementInList = false;
+		int toRemoveIndex = 0;
+		
+		for(int i=0; i<size(); i++) {
+			if(this.array[i] == toRemove) {
+				removedElement = this.array[i];
+				toRemoveIndex = i;
+				toRemoveElementInList = true;
+				break;
+			}
+		}
+		
+		if(toRemoveElementInList) {
+			shiftElementsToLeft(toRemoveIndex);
+		}
+		
+		return removedElement;
+	}
+
+	private void shiftElementsToLeft(int index) {
+		while(index < size()-1) {
+			this.array[index] = this.array[index+1];
+			index++;
+		}
+		
+		size--;
+		
 	}
 
 	@Override

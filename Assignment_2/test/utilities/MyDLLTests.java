@@ -19,6 +19,7 @@ class MyDLLTests {
 	@BeforeEach
 	void setUp() throws Exception {
 		list = new MyDLL<>();
+		newlist = new MyDLL<>();
 
 	}
 	
